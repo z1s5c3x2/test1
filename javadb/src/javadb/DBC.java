@@ -28,7 +28,7 @@ public class DBC {
 			String sql = "insert into useraccount (UserId,UserPwd) values (?,?)";
 			psmt = con.prepareStatement(sql);
 			psmt.setString(1,_id); 
-			psmt.setString(2,org.apache.commons.codec.digest.DigestUtils.sha256Hex(_pwd));
+			psmt.setString(2,CustomSha256hash.GetHash256(_id, _pwd));
 
 			psmt.execute();
 
@@ -59,7 +59,7 @@ public class DBC {
 			if(rs.next())
 			{
 				
-				if (org.apache.commons.codec.digest.DigestUtils.sha256Hex(_pwd).equals(rs.getString(1)))
+				if (CustomSha256hash.GetHash256(_id, _pwd).equals(rs.getString(1)))
 				{
 					return "로그인 성공";
 				}

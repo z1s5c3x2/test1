@@ -1,16 +1,23 @@
 package javadb;
 
 public class SaltUpdate extends Thread  {
-
+	public Long getTime;
 	public void run() 
 	{
+
 		try
 		{
 		while(true)
 		{
-			Thread.sleep(10000);
-			
-			CustomSha256hash.RandomSalt();
+			// System.currentTimeMillis() 1000 =1sec 
+			Thread.sleep(1000);
+			if(System.currentTimeMillis() > getTime)
+			{
+				//System.out.println(System.currentTimeMillis());
+				
+				getTime = CustomSha256hash.RandomSalt(System.currentTimeMillis());
+				
+			}
 		}
 		}
 		catch (Exception e) {

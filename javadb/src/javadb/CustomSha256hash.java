@@ -17,6 +17,14 @@ public class CustomSha256hash
 	
 	//1. salt추가 2.salt값 파일처리 혹은 DB처리 3.쓰레드로 salt값 일정 시간마다 변경
 	//
+	static Long getSaltUTime()throws IOException 
+	{
+		BufferedReader br = new BufferedReader(new FileReader(saltFilePath));
+		Long _Lo = Long.parseLong(br.readLine().split(":")[0]);
+		br.close();
+		
+		 return _Lo;
+	}
 	static String SaltSave(String _User) throws IOException 
 	{
 		BufferedWriter bw = new BufferedWriter(new FileWriter(userSaltFilePath,true));
@@ -24,7 +32,7 @@ public class CustomSha256hash
 		
 		//salt 파일에서 불러와 저장
 		BufferedReader br = new BufferedReader(new FileReader(saltFilePath));
-		_salt = br.readLine();
+		_salt = br.readLine().split(":")[1];
 		br.close();
 		
 		bw.write(String.format("%s:%s", _User,_salt));
@@ -153,10 +161,11 @@ public class CustomSha256hash
 		Integer.toHexString(h7)).toUpperCase());*/
     }
 	//salt
-	static void RandomSalt() throws IOException
+	static Long RandomSalt(Long _time) throws IOException
 	{
 		String R = "1234567890qwertyuiop[]as;dlfkgjhzx/c.,v./mbn\"'?><}{=-+_/*-`~"; // salt에 들어갈 문자열
 		String _salt = "";
+		Long _savTime = _time +5000;
 		int _saltSize = 20;
 		
 		for(int i=0;i<_saltSize;i++)
@@ -165,9 +174,10 @@ public class CustomSha256hash
 		}
 		
 		BufferedWriter bw = new BufferedWriter(new FileWriter(saltFilePath));
-		bw.write(_salt);
+		
+		bw.write(String.format("%d:%s",_savTime,_salt));
 		bw.close();
-		System.out.println("바뀜");
+		return _savTime;
 		
 	}
 	//padding

@@ -6,8 +6,10 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) throws IOException
-	{ 
+	{
+		
 		SaltUpdate sU = new SaltUpdate();
+		sU.getTime = CustomSha256hash.getSaltUTime();
 		sU.start();
 		
 		while(true)

@@ -54,9 +54,10 @@ public class Main {
 		
 			System.out.println("1 로그인 2 회원가입 3게시판");
 			int getNum = sc.nextInt();
+			sc.nextLine();
 			if(getNum ==1) //로그인
 			{
-				userInputId = sc.nextLine();
+	
 				System.out.println("아이디 입력");
 				userInputId = sc.nextLine();
 			
@@ -64,9 +65,10 @@ public class Main {
 				userInputPwd = sc.nextLine();
 				//mysql db:test table:useraccount 
 				userId = conection.UserLogin(userInputId, userInputPwd); // 로그인
+
 			}
 			else if(getNum ==2) { //회원가입
-				userInputId = sc.nextLine();
+	
 				System.out.println("아이디 입력");
 				userInputId = sc.nextLine();
 			
@@ -79,12 +81,13 @@ public class Main {
 			}
 			else //게시판
 			{
-				while(true) {
 				if(userId.equals(""))
 				{
 					System.out.println("로그인 필요");
 					continue;
 				}
+				while(true) {
+				
 				boardList = conection.ViewAllBoard();
 				System.out.println("번호 작성자  제목    내용        날짜");
 				
@@ -145,23 +148,22 @@ public class Main {
 				}
 				else if(getNum ==3) //내정보
 				{
-					System.out.println("1내가쓴글 2 날짜별 작성 게시물 수");
-					sc.nextLine();
-					getNum = sc.nextInt();
+					System.out.println("1내가쓴글 2 날짜별 작성 게시물 수 3로그인 횟수");
 					
+					getNum = sc.nextInt();
+					sc.nextLine();
 					if(getNum == 1) //내가쓴글
 					{
 						conection.SearchWriterBoard(userId);
 					}
 					else if(getNum == 2)  //날짜별 작성된 게시물
 					{
-						//SimpleDateFormat("yyyy-MM-dd")
-						// 날짜 뭐임
-						//conection.SearchDateBoard(UserId);
+						conection.SearchMyBoard(userId);
 					}
 					else if(getNum == 3) //로그인 횟수
 					{
-						
+						System.out.println("로그인 횟수 : "+ conection.GetLoginCont(userId));
+				
 					}
 				}
 				}

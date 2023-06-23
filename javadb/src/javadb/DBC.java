@@ -1,6 +1,9 @@
 package javadb;
-import java.util.Scanner;
-import java.security.Timestamp;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -8,7 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Scanner;
+
 
 
 public class DBC {
@@ -68,6 +72,9 @@ public class DBC {
 				
 				if (CustomSha256hash.GetHash256(_id, _pwd).equals(rs.getString(1)))
 				{
+					
+					WriteUserLoginLog(_id);
+			
 					return _id;
 				}
 				else
@@ -135,11 +142,11 @@ public class DBC {
 			
 		
 	}
-	public void SearchDateBoard(String _User)
+	public void SearchMyBoard(String _User)
 	{
 		try {
-			
-			String sql = "select * from board where user like ?";
+
+			String sql = "select * from board where writer like ?";
 			psmt = con.prepareStatement(sql);
 			psmt.setString(1, _User);
 			
@@ -147,14 +154,32 @@ public class DBC {
 			rs = psmt.executeQuery();
 			System.out.println("번호 제목 작성자 조회수");
 			SimpleDateFormat dtF = new SimpleDateFormat("yyyy-MM-dd");
-			Calendar cal = Calendar.getInstance();
-			Date dt = (Date) dtF.parse("1");
-			
-			cal.setTime(dt);
+			Date getdate = new Date(0);
+			int count = 0;
+			if(rs.next())
+			{
+				getdate = rs.getDate("createdate");
+				count ++;
+			}
+
 			
 			while(rs.next())
 			{
 				
+				if(getdate.equals(rs.getDate("createdate")))
+				{
+					count ++;
+				}
+				else
+				{
+					System.out.printf("%s 날짜에 작성 횟수 : %d \n",getdate.toString(),count);
+					getdate =  rs.getDate("createdate");
+					count = 1;
+				}
+			}
+			if(count != 0)
+			{
+				System.out.printf("%s 날짜에 작성 횟수 : %d \n",getdate.toString(),count);
 			}
 
 		} catch (Exception e) {
@@ -248,6 +273,51 @@ public class DBC {
 			// TODO: handle exception
 		}
 		
+	}
+	public void WriteUserLoginLog(String _User) throws IOException 
+	{
+		try {
+
+			String sql = "select now()";//"select date_format(now(), '%Y-%M-%d')";
+			psmt = con.prepareStatement(sql);
+			psmt.execute();
+			rs = psmt.executeQuery();
+			rs.next();
+			Date _d = rs.getDate(1);
+			//System.out.println(rs.getDate(1).toString());
+			
+			BufferedWriter bw = new BufferedWriter(new FileWriter("C:/userlog.txt",true));
+			bw.write(String.format("%s:%s",_User,_d.toString()));
+			bw.newLine();
+			bw.close();
+		} catch (Exception e) {
+
+			System.out.println(e);
+			// TODO: handle exception
+		}
+
+	}
+	
+	public int GetLoginCont(String _User) throws IOException 
+	{
+		int count = 0;
+		BufferedReader br = new BufferedReader(new FileReader("C:/userlog.txt"));
+		
+		while(true)
+        {
+            String _str = br.readLine();
+            if(_str == null)
+            {
+                break; 
+            }
+            if(_User.equals(_str.split(":")[0]))
+			{
+				 count ++;
+			}
+        }
+		br.close();
+		
+		return count;
 	}
 	
 	

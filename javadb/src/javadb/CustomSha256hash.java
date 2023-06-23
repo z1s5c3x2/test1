@@ -1,8 +1,6 @@
 package javadb;
 
 import java.util.ArrayList;
-import java.io.File;
-import java.util.Random;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;

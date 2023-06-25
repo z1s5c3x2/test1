@@ -1,0 +1,25 @@
+DB = test
+
+table
+
+create useraccount(
+    userid varchar(20) not null primarykey,
+    userpwd varchar(64) not null,
+)
+create board(
+    id int primarykey auto_increment,
+    title varchar(20) not null,
+    writer varchar(20) not null,
+    content varchar(200) not null,
+    create date default (current_date),
+    viewcount int default 0,
+)
+
+create comment(
+    id int primarykey auto_increment,
+    board_id int not null,
+    writer varchar(20) not null,
+    content varchar(100) not null,
+    create date default (current_date),
+    foreign key(board_id) references board(id) ondelete CASCADE
+)

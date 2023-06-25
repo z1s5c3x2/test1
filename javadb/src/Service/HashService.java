@@ -1,71 +1,26 @@
-package javadb;
+package Service;
 
 import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.FileReader;
-import java.io.FileWriter;
 
-public class CustomSha256hash 
+
+public class HashService
 {
-	
-	public static final String userSaltFilePath = "C:/usersalt.txt";
-	public static final String saltFilePath = "C:/salt.txt";
-	
-	//1. salt추가 2.salt값 파일처리 혹은 DB처리 3.쓰레드로 salt값 일정 시간마다 변경
-	//
-	static Long getSaltUTime()throws IOException 
+	private static HashService instance;
+	public static HashService Instance()
 	{
-		BufferedReader br = new BufferedReader(new FileReader(saltFilePath));
-		Long _Lo = Long.parseLong(br.readLine().split(":")[0]);
-		br.close();
-		
-		 return _Lo;
-	}
-	static String SaltSave(String _User) throws IOException 
-	{
-		BufferedWriter bw = new BufferedWriter(new FileWriter(userSaltFilePath,true));
-		String _salt;
-		
-		//salt 파일에서 불러와 저장
-		BufferedReader br = new BufferedReader(new FileReader(saltFilePath));
-		_salt = br.readLine().split(":")[1];
-		br.close();
-		
-		bw.write(String.format("%s:%s", _User,_salt));
-		bw.newLine();
-		bw.close();
-		return _salt;
+		if(instance == null)
+		{
+			instance = new HashService();
+		}
+		return instance;
 	}
 
-	static String SaltLoad(String _User) throws IOException
-	{
-		
-		BufferedReader br = new BufferedReader(new FileReader(userSaltFilePath));
 
-		while(true)
-        {
-            String _br = br.readLine();
-            if(_br == null)
-            {
-                break; 
-            }
-            if(_User.equals(_br.split(":")[0]))
-			{
-				br.close();
-				return _br.split(":")[1];
-			}
-        }
-
-		br.close();
-		return SaltSave(_User);
-	}
-	public static String GetHash256(String _user,String _pwd) throws IOException
+	public String GetHash256(String _user,String _pwd)
 	{
 		//salt값이 없을시 생성 있으면 파일에서 불러오기
 		
-		String salt = SaltLoad(_user); //salt 
+		String salt = FileService.Instance().SaltSaveCheck(_user);//fileload
 		_pwd +=salt;
 		
 		
@@ -158,26 +113,6 @@ public class CustomSha256hash
 		Integer.toHexString(h6)+
 		Integer.toHexString(h7)).toUpperCase());*/
     }
-	//salt
-	static Long RandomSalt(Long _time) throws IOException
-	{
-		String R = "1234567890qwertyuiop[]as;dlfkgjhzx/c.,v./mbn\"'?><}{=-+_/*-`~"; // salt에 들어갈 문자열
-		String _salt = "";
-		Long _savTime = _time +5000;
-		int _saltSize = 20;
-		
-		for(int i=0;i<_saltSize;i++)
-		{
-			_salt += R.charAt((int)(Math.random()*R.length()));
-		}
-		
-		BufferedWriter bw = new BufferedWriter(new FileWriter(saltFilePath));
-		
-		bw.write(String.format("%d:%s",_savTime,_salt));
-		bw.close();
-		return _savTime;
-		
-	}
 	//padding
 	static void Padding(ArrayList<String> _strList ,String _msg,int _msglen)
 	{
@@ -279,7 +214,8 @@ public class CustomSha256hash
 	}
 
 
-	//Round S0,S1,Maj,Ch 시프트 연산 연산 과정을 시뮬레이션하면서 봤지만 아래4개 상황과 비슷한 다른 문제가 나올때 그 문제를 보고 시프트연산으로 처리할수 없을거같음
+	//Round S0,S1,Maj,Ch 아래의 비트 연산을 직접 보면서 해봤지만 아래4개 상황과 비슷한 다른 문제가 나올때 그 문제를 보고 비트연산으로 처리할수 없을거같음
+    //ex) maj 과정을 직접 구현하려 했을 때 3개의 정수를 문자열로 바꿔 각 자릿수 마다 0,1의 갯수를 비교하여 결정
 
 	//Σ0 은 인자값을 2, 13, 22 만큼 각각 오른쪽으로 돌리고 그 세값을 비교하여 합이 홀수인 곳은 1, 0이거나 짝수인 곳은 0으로 표기한다
 	static int RodS0(int _int) {

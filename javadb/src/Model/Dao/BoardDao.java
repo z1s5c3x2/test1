@@ -1,7 +1,6 @@
 package Model.Dao;
 import Model.Dto.BoardDto;
 import java.util.ArrayList;
-import java.text.SimpleDateFormat;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -159,41 +158,17 @@ public class BoardDao {
 		ArrayList<String> countList = new ArrayList<String>();
 		try {
 
-			String sql = "select * from board where writer like ?";
+			String sql = "select createdate, count(*) from board where writer like ? group by createdate";
 			ps = DBDao.Instance().con.prepareStatement(sql);
 			ps.setString(1, _User);			
 			ps.execute();
 			rs = ps.executeQuery();
 			
-			
-
-			Date getdate = new Date(0);
-			int count = 0;
-			if(rs.next())
-			{
-				getdate = rs.getDate("createdate");
-				count ++;
-			}
-
-			
 			while(rs.next())
 			{
-				
-				if(getdate.equals(rs.getDate("createdate")))
-				{
-					count ++;
-				}
-				else
-				{
-					countList.add(String.format("%s 날짜에 작성 횟수 : %d \n",getdate.toString(),count));
-					getdate =  rs.getDate("createdate");
-					count = 1;
-				}
+				countList.add(String.format("%s: %d개",rs.getString("createdate"),rs.getInt("count(*)")));
 			}
-			if(count != 0)
-			{
-				countList.add(String.format("%s 날짜에 작성 횟수 : %d \n",getdate.toString(),count));
-			}
+
 
 		} catch (Exception e) {
 			System.out.println(e);

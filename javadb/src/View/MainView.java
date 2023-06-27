@@ -205,6 +205,7 @@ public class MainView {
                     
                     CommentController.Instance().AddComment(AccountDao.Instance().adt.GetId(),_c, _bdt.getId());
                     BoardInfo(_bdt);
+                    break;
                 }
             }
             else
